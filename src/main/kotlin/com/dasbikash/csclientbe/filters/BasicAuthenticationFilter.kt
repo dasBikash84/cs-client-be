@@ -1,6 +1,6 @@
 package com.dasbikash.csclientbe.filters
 
-import com.dasbikash.csclientbe.services.BasicAuthService
+import com.dasbikash.csclientbe.utils.BasicAuthUtils
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -14,15 +14,13 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
-class BasicAuthenticationFilter(
-        open var userDetailsService: UserDetailsService,
-        open var basicAuthService: BasicAuthService)
+class BasicAuthenticationFilter(open var userDetailsService: UserDetailsService)
     : OncePerRequestFilter() {
 
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
 
-        basicAuthService.getAuthRequest(request)?.let {
+        BasicAuthUtils.getAuthRequest(request)?.let {
             userDetailsService.loadUserByUsername(it.id)?.apply {
                 val usernamePasswordAuthenticationToken =
                         UsernamePasswordAuthenticationToken(this, null, this.getAuthorities())

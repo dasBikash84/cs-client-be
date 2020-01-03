@@ -1,6 +1,6 @@
 package com.dasbikash.csclientbe.model.request
 
-class UserRegisterRequest(
+class CsUserRegisterRequest(
         val id: String,
         val details: String?=null
 )

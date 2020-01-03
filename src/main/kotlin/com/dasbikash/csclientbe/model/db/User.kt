@@ -1,7 +1,7 @@
 package com.dasbikash.csclientbe.model.db
 
 import com.dasbikash.csclientbe.config.UserAuthorities
-import com.dasbikash.csclientbe.model.request.UserRegisterRequest
+import com.dasbikash.csclientbe.model.request.CsUserRegisterRequest
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -64,7 +64,7 @@ data class User(
 
     @Transient
     @JsonIgnore
-    fun getUserRegisterRequest(): UserRegisterRequest {
-        return UserRegisterRequest(userId!!,"$firstName $lastName")
+    fun getUserRegisterRequest(): CsUserRegisterRequest {
+        return CsUserRegisterRequest(userId!!,"Full name: $firstName $lastName")
     }
 }

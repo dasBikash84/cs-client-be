@@ -12,7 +12,8 @@ import javax.validation.Valid
 class AuthService(
         private var userRepository: UserRepository?=null,
         private var passwordEncoder: PasswordEncoder?=null,
-        private var userDetailsService: CsClientUserDetailsService?=null
+        private var userDetailsService: CsClientUserDetailsService?=null,
+        private var registererToCsService: RegistererToCsService?=null
 ) {
 
     fun userSignUp(@Valid user: User, isEndUser:Boolean=true): SuccessResponse {
@@ -21,6 +22,15 @@ class AuthService(
         user.isEndUser = isEndUser
         user.isCustomerManager = !isEndUser
         userRepository!!.save(user)
+        try {
+            registererToCsService!!.registerUser(user.getUserRegisterRequest())
+            user.registeredToCs = true
+            userRepository!!.save(user)
+        }catch (ex:Throwable){
+            ex.printStackTrace()
+            user.registeredToCs = false
+            userRepository!!.save(user)
+        }
         return SuccessResponse(USER_SIGN_SUCCESS_MESSAGE)
     }
 
