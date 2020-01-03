@@ -1,6 +1,7 @@
 package com.dasbikash.csclientbe.config
 
 
+import com.dasbikash.csclientbe.filters.BasicAuthenticationFilter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
@@ -11,11 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @EnableWebSecurity
 class SecurityConfiguration(
         @Qualifier("userDetailsService")
-        open var userDetailsService: UserDetailsService
+        open var userDetailsService: UserDetailsService,
+        open var basicAuthenticationFilter: BasicAuthenticationFilter
 ): WebSecurityConfigurerAdapter() {
 
     @Bean
@@ -34,11 +37,15 @@ class SecurityConfiguration(
                 .authorizeRequests()
                 .antMatchers(OPEN_API_PATH).permitAll()
                 .antMatchers(HttpMethod.GET,SWAGGER_UI_PATH,BASE_HTML_PATH).permitAll()
+                .antMatchers("/${ContextPathUtils.AUTH_CONTROLLER_BASE_PATH}/**").permitAll()
+                .antMatchers("/${ContextPathUtils.CM_CONTROLLER_BASE_PATH}/**").hasAuthority(UserAuthorities.CM.name)
+                .antMatchers("/${ContextPathUtils.USER_CONTROLLER_BASE_PATH}/**").hasAuthority(UserAuthorities.USER.name)
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        httpSecurity.addFilterBefore(basicAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
     }
     companion object{
         private const val OPEN_API_PATH = "/v3/api-docs/**"
