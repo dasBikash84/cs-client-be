@@ -1,6 +1,7 @@
 package com.dasbikash.csclientbe.model.db
 
 import com.dasbikash.csclientbe.config.UserAuthorities
+import com.dasbikash.csclientbe.model.request.UserRegisterRequest
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -17,6 +18,10 @@ data class User(
         var password:String?=null,
         var firstName:String?=null,
         var lastName:String?=null,
+        var isCustomerManager: Boolean=false,
+        var isEndUser: Boolean=true,
+        @JsonIgnore
+        var registeredToCs: Boolean = false,
         @JsonIgnore
         var enabled: Boolean=true,
         @JsonIgnore
@@ -38,7 +43,13 @@ data class User(
         return object : UserDetails {
             override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
                 return mutableListOf(object : GrantedAuthority {
-                    override fun getAuthority() = UserAuthorities.USER.name
+                    override fun getAuthority():String{
+                        if (isCustomerManager){
+                            return UserAuthorities.CM.name
+                        }else {
+                            return UserAuthorities.EndUSER.name
+                        }
+                    }
                 })
             }
 
@@ -49,5 +60,11 @@ data class User(
             override fun isAccountNonExpired(): Boolean = true
             override fun isAccountNonLocked(): Boolean = true
         }
+    }
+
+    @Transient
+    @JsonIgnore
+    fun getUserRegisterRequest(): UserRegisterRequest {
+        return UserRegisterRequest(userId!!,"$firstName $lastName")
     }
 }

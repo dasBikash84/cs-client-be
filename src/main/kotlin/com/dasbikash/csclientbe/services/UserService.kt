@@ -11,9 +11,27 @@ class UserService(
         open var basicAuthService: BasicAuthService?=null,
         open var userRepository: UserRepository?=null
 ) {
-    fun getDetails(request: HttpServletRequest): User {
+    fun getEndUserDetails(request: HttpServletRequest): User {
         basicAuthService!!.getAuthRequest(request)!!.apply {
-            return userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }
+            userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
+                if (isEndUser){
+                    return this
+                }else{
+                    throw CsClientAuthenticationException()
+                }
+            }
+        }
+    }
+
+    fun getCmDetails(request: HttpServletRequest): User {
+        basicAuthService!!.getAuthRequest(request)!!.apply {
+            userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
+                if (isCustomerManager){
+                    return this
+                }else{
+                    throw CsClientAuthenticationException()
+                }
+            }
         }
     }
 }

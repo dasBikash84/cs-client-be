@@ -1,7 +1,6 @@
 package com.dasbikash.csclientbe.controllers
 
 import com.dasbikash.csclientbe.config.ContextPathUtils
-import com.dasbikash.csclientbe.model.db.CustomerManager
 import com.dasbikash.csclientbe.model.db.User
 import com.dasbikash.csclientbe.model.response.SuccessResponse
 import com.dasbikash.csclientbe.services.AuthService
@@ -19,14 +18,14 @@ class AuthController(
         private var authService: AuthService?=null
 ) {
     @PutMapping(CM_SIGN_UP_PATH)
-    fun cmSignUp(@RequestBody customerManager: CustomerManager,@Autowired request:HttpServletRequest):
+    fun cmSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
             ResponseEntity<SuccessResponse>{
-        return ResponseEntity.ok(authService!!.cmSignUp(customerManager))
+        return ResponseEntity.ok(authService!!.userSignUp(user,isEndUser = false))
     }
     @PutMapping(USER_SIGN_UP_PATH)
     fun userSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
             ResponseEntity<SuccessResponse>{
-        return ResponseEntity.ok(authService!!.userSignUp(user))
+        return ResponseEntity.ok(authService!!.userSignUp(user,isEndUser = true))
     }
 
     companion object{

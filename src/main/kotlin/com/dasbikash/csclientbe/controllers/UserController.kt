@@ -18,6 +18,6 @@ class UserController(
     @GetMapping
     fun getDetails(@Autowired request: HttpServletRequest):
             ResponseEntity<User> {
-        return ResponseEntity.ok(userService!!.getDetails(request))
+        return ResponseEntity.ok(userService!!.getEndUserDetails(request))
     }
 }

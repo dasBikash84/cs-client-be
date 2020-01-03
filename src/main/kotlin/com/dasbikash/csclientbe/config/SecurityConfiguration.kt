@@ -39,7 +39,7 @@ class SecurityConfiguration(
                 .antMatchers(HttpMethod.GET,SWAGGER_UI_PATH,BASE_HTML_PATH).permitAll()
                 .antMatchers("/${ContextPathUtils.AUTH_CONTROLLER_BASE_PATH}/**").permitAll()
                 .antMatchers("/${ContextPathUtils.CM_CONTROLLER_BASE_PATH}/**").hasAuthority(UserAuthorities.CM.name)
-                .antMatchers("/${ContextPathUtils.USER_CONTROLLER_BASE_PATH}/**").hasAuthority(UserAuthorities.USER.name)
+                .antMatchers("/${ContextPathUtils.USER_CONTROLLER_BASE_PATH}/**").hasAuthority(UserAuthorities.EndUSER.name)
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
