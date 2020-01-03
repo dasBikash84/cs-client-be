@@ -24,7 +24,7 @@ class RegistererToCsService(
         Thread.sleep(USER_REG_LOP_REGULAR_SLEEP_TIME)
     }
     override fun run(vararg args: String?) {
-        BgTaskUtils.launchContinuousBgTask(registerTask,"Pending user registration on Chat Service")
+        BgTaskUtils.launchContinuousBgTask(registerTask,PENDING_REG_SYNC_TASK_NAME)
     }
 
     fun registerUser(csUserRegisterRequest: CsUserRegisterRequest){
@@ -33,5 +33,6 @@ class RegistererToCsService(
 
     companion object{
         private val USER_REG_LOP_REGULAR_SLEEP_TIME = DateUtils.MINUTE_IN_MS
+        private const val PENDING_REG_SYNC_TASK_NAME = "Pending user registration on Chat Service"
     }
 }

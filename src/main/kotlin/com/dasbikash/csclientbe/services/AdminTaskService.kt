@@ -1,6 +1,8 @@
 package com.dasbikash.csclientbe.services
 
+import com.dasbikash.csclientbe.exceptions.CsClientAuthenticationException
 import com.dasbikash.csclientbe.exceptions.CsNotAvailableException
+import com.dasbikash.csclientbe.model.db.User
 import com.dasbikash.csclientbe.model.request.CsTokenReqResponse
 import com.dasbikash.csclientbe.model.request.CsUserRegisterRequest
 import com.dasbikash.csclientbe.model.response.CsSuccessResponse
@@ -61,6 +63,30 @@ class AdminTaskService(
             return restTemplate.exchange(ADMIN_BASE_PATH + REGISTER_CM_PATH, HttpMethod.PUT, entity, CsSuccessResponse::class.java).body
         }else{
             return restTemplate.exchange(ADMIN_BASE_PATH + REGISTER_USER_PATH, HttpMethod.PUT, entity, CsSuccessResponse::class.java).body
+        }
+    }
+
+    fun generateCustomerManagerAccessToken(user: User):CsTokenReqResponse{
+        if (user.isCustomerManager){
+            val entity = HttpEntity<Any>(getJwtHeader())
+            val restTemplate = RestTemplate()
+            return restTemplate.exchange(ADMIN_BASE_PATH + GENERATE_CM_ACCESS_TOKEN_PATH,
+                                            HttpMethod.GET, entity,
+                                            CsTokenReqResponse::class.java,user.userId!!).body!!
+        }else{
+            throw CsClientAuthenticationException()
+        }
+    }
+
+    fun generateEndUserAccessToken(user: User):CsTokenReqResponse{
+        if (user.isEndUser){
+            val entity = HttpEntity<Any>(getJwtHeader())
+            val restTemplate = RestTemplate()
+            return restTemplate.exchange(ADMIN_BASE_PATH + GENERATE_USER_ACCESS_TOKEN_PATH,
+                                            HttpMethod.GET, entity,
+                                            CsTokenReqResponse::class.java,user.userId!!).body!!
+        }else{
+            throw CsClientAuthenticationException()
         }
     }
 
