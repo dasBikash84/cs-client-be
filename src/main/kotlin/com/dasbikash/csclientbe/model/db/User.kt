@@ -18,7 +18,9 @@ data class User(
         var password:String?=null,
         var firstName:String?=null,
         var lastName:String?=null,
+        @JsonIgnore
         var isCustomerManager: Boolean=false,
+        @JsonIgnore
         var isEndUser: Boolean=true,
         @JsonIgnore
         var registeredToCs: Boolean = false,
