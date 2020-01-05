@@ -67,22 +67,26 @@ class AdminTaskService(
     }
 
     fun generateCustomerManagerAccessToken(user: User):CsTokenReqResponse{
-        if (user.isCustomerManager){
-            val entity = HttpEntity<Any>(getJwtHeader())
-            val restTemplate = RestTemplate()
-            return restTemplate.exchange(ADMIN_BASE_PATH + GENERATE_CM_ACCESS_TOKEN_PATH,
-                                            HttpMethod.GET, entity,
-                                            CsTokenReqResponse::class.java,user.userId!!).body!!
-        }else{
-            throw CsClientAuthenticationException()
-        }
+        return generateUserToken(user,GENERATE_CM_ACCESS_TOKEN_PATH){user.isCustomerManager}
+    }
+
+    fun generateCustomerManagerSessionToken(user: User):CsTokenReqResponse{
+        return generateUserToken(user,GENERATE_CM_SESSION_TOKEN_PATH){user.isCustomerManager}
     }
 
     fun generateEndUserAccessToken(user: User):CsTokenReqResponse{
-        if (user.isEndUser){
+        return generateUserToken(user,GENERATE_USER_ACCESS_TOKEN_PATH){user.isEndUser}
+    }
+
+    fun generateEndUserSessionToken(user: User):CsTokenReqResponse {
+        return generateUserToken(user, GENERATE_USER_SESSION_TOKEN_PATH){user.isEndUser}
+    }
+
+    private fun generateUserToken(user: User,path:String,validateUserType:(User)->Boolean):CsTokenReqResponse{
+        if (validateUserType(user)){
             val entity = HttpEntity<Any>(getJwtHeader())
             val restTemplate = RestTemplate()
-            return restTemplate.exchange(ADMIN_BASE_PATH + GENERATE_USER_ACCESS_TOKEN_PATH,
+            return restTemplate.exchange(ADMIN_BASE_PATH + path,
                                             HttpMethod.GET, entity,
                                             CsTokenReqResponse::class.java,user.userId!!).body!!
         }else{
@@ -98,6 +102,8 @@ class AdminTaskService(
         private const val REGISTER_USER_PATH = "register-user"
         private const val GENERATE_CM_ACCESS_TOKEN_PATH = "cm-access-token/{cmId}"
         private const val GENERATE_USER_ACCESS_TOKEN_PATH = "user-access-token/{userId}"
+        private const val GENERATE_CM_SESSION_TOKEN_PATH = "cm-session-token/{cmId}"
+        private const val GENERATE_USER_SESSION_TOKEN_PATH = "user-session-token/{userId}"
         private const val GET_CM_PATH = "get-cm/{cmId}"
         private const val GET_USER_PATH = "get-user/{userId}"
         private const val ENABLE_CM_PATH = "enable-cm/{cmId}"

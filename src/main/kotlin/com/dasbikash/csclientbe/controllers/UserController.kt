@@ -15,8 +15,12 @@ import javax.servlet.http.HttpServletRequest
 class UserController(
         open var userService: UserService?=null
 ) {
-    @GetMapping("generate-token")
+    @GetMapping("generate-access-token")
     fun getAccessToken(@Autowired request: HttpServletRequest):ResponseEntity<CsTokenReqResponse>{
         return ResponseEntity.ok(userService!!.generateAccessToken(request))
+    }
+    @GetMapping("generate-session-token")
+    fun getSessionToken(@Autowired request: HttpServletRequest):ResponseEntity<CsTokenReqResponse>{
+        return ResponseEntity.ok(userService!!.generateSessionToken(request))
     }
 }

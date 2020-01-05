@@ -24,4 +24,15 @@ class UserService(
             }
         }
     }
+    fun generateSessionToken(request: HttpServletRequest): CsTokenReqResponse {
+        BasicAuthUtils.getAuthRequest(request)!!.apply {
+            userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
+                if (isCustomerManager){
+                    return adminTaskService!!.generateCustomerManagerSessionToken(this)
+                }else{
+                    return adminTaskService!!.generateEndUserSessionToken(this)
+                }
+            }
+        }
+    }
 }
