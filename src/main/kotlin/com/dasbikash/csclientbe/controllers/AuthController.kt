@@ -14,18 +14,18 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping(path = [ContextPathUtils.AUTH_CONTROLLER_BASE_PATH])
-class AuthController(
-        private var authService: AuthService?=null
+open class AuthController @Autowired constructor(
+        private val authService: AuthService
 ) {
     @PutMapping(CM_SIGN_UP_PATH)
-    fun cmSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
+    open fun cmSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
             ResponseEntity<SuccessResponse>{
-        return ResponseEntity.ok(authService!!.userSignUp(user,isEndUser = false))
+        return ResponseEntity.ok(authService.userSignUp(user,isEndUser = false))
     }
     @PutMapping(USER_SIGN_UP_PATH)
-    fun userSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
+    open fun userSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
             ResponseEntity<SuccessResponse>{
-        return ResponseEntity.ok(authService!!.userSignUp(user,isEndUser = true))
+        return ResponseEntity.ok(authService.userSignUp(user,isEndUser = true))
     }
 
     companion object{

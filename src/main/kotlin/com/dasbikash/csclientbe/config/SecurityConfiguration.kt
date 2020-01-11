@@ -2,6 +2,7 @@ package com.dasbikash.csclientbe.config
 
 
 import com.dasbikash.csclientbe.filters.BasicAuthenticationFilter
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
@@ -15,10 +16,10 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @EnableWebSecurity
-class SecurityConfiguration(
+open class SecurityConfiguration @Autowired constructor(
         @Qualifier("userDetailsService")
-        open var userDetailsService: UserDetailsService,
-        open var basicAuthenticationFilter: BasicAuthenticationFilter
+        private val userDetailsService: UserDetailsService,
+        private val basicAuthenticationFilter: BasicAuthenticationFilter
 ): WebSecurityConfigurerAdapter() {
 
     @Bean

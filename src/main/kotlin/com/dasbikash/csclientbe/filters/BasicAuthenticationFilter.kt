@@ -1,6 +1,7 @@
 package com.dasbikash.csclientbe.filters
 
 import com.dasbikash.csclientbe.utils.BasicAuthUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -14,7 +15,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
-class BasicAuthenticationFilter(open var userDetailsService: UserDetailsService)
+open class BasicAuthenticationFilter @Autowired constructor(private val userDetailsService: UserDetailsService)
     : OncePerRequestFilter() {
 
     @Throws(ServletException::class, IOException::class)

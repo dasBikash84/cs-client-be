@@ -4,38 +4,39 @@ import com.dasbikash.csclientbe.exceptions.SignupException
 import com.dasbikash.csclientbe.model.db.User
 import com.dasbikash.csclientbe.model.response.SuccessResponse
 import com.dasbikash.csclientbe.repos.UserRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import javax.validation.Valid
 
 @Service
-class AuthService(
-        private var userRepository: UserRepository?=null,
-        private var passwordEncoder: PasswordEncoder?=null,
-        private var userDetailsService: CsClientUserDetailsService?=null,
-        private var registererToCsService: RegistererToCsService?=null
+open class AuthService @Autowired constructor(
+        private val userRepository: UserRepository,
+        private val passwordEncoder: PasswordEncoder,
+        private val userDetailsService: CsClientUserDetailsService,
+        private val registererToCsService: RegistererToCsService
 ) {
 
-    fun userSignUp(@Valid user: User, isEndUser:Boolean=true): SuccessResponse {
+    open fun userSignUp(@Valid user: User, isEndUser:Boolean=true): SuccessResponse {
         checkIfUserIdTaken(user.userId)
-        user.password = passwordEncoder!!.encode(user.password)
+        user.password = passwordEncoder.encode(user.password)
         user.isEndUser = isEndUser
         user.isCustomerManager = !isEndUser
-        userRepository!!.save(user)
+        userRepository.save(user)
         try {
-            registererToCsService!!.registerUser(user.getUserRegisterRequest())
+            registererToCsService.registerUser(user.getUserRegisterRequest())
             user.registeredToCs = true
-            userRepository!!.save(user)
+            userRepository.save(user)
         }catch (ex:Throwable){
             ex.printStackTrace()
             user.registeredToCs = false
-            userRepository!!.save(user)
+            userRepository.save(user)
         }
         return SuccessResponse(USER_SIGN_SUCCESS_MESSAGE)
     }
 
     private fun checkIfUserIdTaken(userId:String?){
-        userDetailsService!!.loadUserByUsername(userId)?.let {
+        userDetailsService.loadUserByUsername(userId)?.let {
             throw SignupException(DUPLICATE_USER_ID_MESSAGE)
         }
     }

@@ -7,14 +7,14 @@ import org.springframework.web.client.RestTemplate
 import java.security.SecureRandom
 
 @Configuration
-class DefaultConfig {
+open class DefaultConfig {
 
     companion object{
         private const val SALT = "chatservererclientlabon"
     }
 
     @Bean
-    fun  getPasswordEncoder(): BCryptPasswordEncoder {
+    open fun  getPasswordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder(12, SecureRandom(SALT.toByteArray()))
     }
 }

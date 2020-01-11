@@ -9,6 +9,8 @@ import com.dasbikash.csclientbe.model.response.CsSuccessResponse
 import com.dasbikash.csclientbe.repos.UserRepository
 import com.dasbikash.csclientbe.utils.AuthenticationRequest
 import com.dasbikash.csclientbe.utils.BasicAuthUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -18,9 +20,31 @@ import org.springframework.web.client.RestTemplate
 
 
 @Service
-class AdminTaskService(
-        private var userRepository: UserRepository?=null
+open class AdminTaskService @Autowired constructor(
+        private val userRepository: UserRepository
 ) {
+    @Value("\${cs-admin.path}")
+    private var CHAT_SERVICE_BASE_PATH:String = ""
+    private val ADMIN_BASE_PATH = CHAT_SERVICE_BASE_PATH+"client-admin/"
+    private val LOG_IN_PATH = "auth/login"
+    private val REGISTER_CM_PATH = "register-cm"
+    private val REGISTER_USER_PATH = "register-user"
+    private val GENERATE_CM_ACCESS_TOKEN_PATH = "cm-access-token/{cmId}"
+    private val GENERATE_USER_ACCESS_TOKEN_PATH = "user-access-token/{userId}"
+    private val GENERATE_CM_SESSION_TOKEN_PATH = "cm-session-token/{cmId}"
+    private val GENERATE_USER_SESSION_TOKEN_PATH = "user-session-token/{userId}"
+    private val GET_CM_PATH = "get-cm/{cmId}"
+    private val GET_USER_PATH = "get-user/{userId}"
+    private val ENABLE_CM_PATH = "enable-cm/{cmId}"
+    private val ENABLE_USER_PATH = "enable-user/{userId}"
+    private val DISABLE_CM_PATH = "disable-cm/{cmId}"
+    private val DISABLE_USER_PATH = "disable-user/{userId}"
+    private val SIGN_OUT_PATH = "sign-out"
+
+    private val CS_ADMIN_USER_ID = "client001"
+    private val CS_ADMIN_USER_PASSWORD = "1234"
+
+    private val JWT_TOKEN_PREAMBLE = "Bearer "
 
     private var csJwtAccessToken:String? = null
 
@@ -56,7 +80,7 @@ class AdminTaskService(
     }
 
     fun registerUser(csUserRegisterRequest: CsUserRegisterRequest):CsSuccessResponse?{
-        val user = userRepository!!.findById(csUserRegisterRequest.id).orElseThrow { IllegalArgumentException() }
+        val user = userRepository.findById(csUserRegisterRequest.id).orElseThrow { IllegalArgumentException() }
         val entity = HttpEntity<Any>(csUserRegisterRequest, getJwtHeader())
         val restTemplate = RestTemplate()
         if (user.isCustomerManager) {
@@ -92,30 +116,5 @@ class AdminTaskService(
         }else{
             throw CsClientAuthenticationException()
         }
-    }
-
-    companion object{
-        private const val CHAT_SERVICE_BASE_PATH = "http://localhost:8055/"
-        private const val ADMIN_BASE_PATH = CHAT_SERVICE_BASE_PATH+"client-admin/"
-        private const val LOG_IN_PATH = "auth/login"
-        private const val REGISTER_CM_PATH = "register-cm"
-        private const val REGISTER_USER_PATH = "register-user"
-        private const val GENERATE_CM_ACCESS_TOKEN_PATH = "cm-access-token/{cmId}"
-        private const val GENERATE_USER_ACCESS_TOKEN_PATH = "user-access-token/{userId}"
-        private const val GENERATE_CM_SESSION_TOKEN_PATH = "cm-session-token/{cmId}"
-        private const val GENERATE_USER_SESSION_TOKEN_PATH = "user-session-token/{userId}"
-        private const val GET_CM_PATH = "get-cm/{cmId}"
-        private const val GET_USER_PATH = "get-user/{userId}"
-        private const val ENABLE_CM_PATH = "enable-cm/{cmId}"
-        private const val ENABLE_USER_PATH = "enable-user/{userId}"
-        private const val DISABLE_CM_PATH = "disable-cm/{cmId}"
-        private const val DISABLE_USER_PATH = "disable-user/{userId}"
-        private const val SIGN_OUT_PATH = "sign-out"
-
-        private const val CS_ADMIN_USER_ID = "client001"
-        private const val CS_ADMIN_USER_PASSWORD = "1234"
-
-        private const val JWT_TOKEN_PREAMBLE = "Bearer "
-
     }
 }
