@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 open class SecurityConfiguration @Autowired constructor(
         @Qualifier("userDetailsService")
         private val userDetailsService: UserDetailsService,
-        private val passwordEncoder: PasswordEncoder?
+        private val passwordEncoder: PasswordEncoder
 ): WebSecurityConfigurerAdapter() {
 
     @Bean
