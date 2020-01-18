@@ -4,7 +4,6 @@ import com.dasbikash.csclientbe.exceptions.CsClientAuthenticationException
 import com.dasbikash.csclientbe.model.db.User
 import com.dasbikash.csclientbe.model.request.CsTokenReqResponse
 import com.dasbikash.csclientbe.repos.UserRepository
-import com.dasbikash.csclientbe.utils.BasicAuthUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.lang.IllegalArgumentException
@@ -13,11 +12,12 @@ import javax.servlet.http.HttpServletRequest
 @Service
 open class UserService @Autowired constructor(
         private val userRepository: UserRepository,
-        private val adminTaskService: AdminTaskService
+        private val adminTaskService: AdminTaskService,
+        private val basicAuthService: BasicAuthService
 
 ) {
     fun generateAccessToken(request: HttpServletRequest): CsTokenReqResponse {
-        BasicAuthUtils.getAuthRequest(request)!!.apply {
+        basicAuthService.getAuthRequest(request)!!.apply {
             userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
                 if (isCustomerManager){
                     return adminTaskService!!.generateCustomerManagerAccessToken(this)
@@ -28,7 +28,7 @@ open class UserService @Autowired constructor(
         }
     }
     fun generateSessionToken(request: HttpServletRequest): CsTokenReqResponse {
-        BasicAuthUtils.getAuthRequest(request)!!.apply {
+        basicAuthService.getAuthRequest(request)!!.apply {
             userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
                 if (isCustomerManager){
                     return adminTaskService!!.generateCustomerManagerSessionToken(this)

@@ -7,8 +7,6 @@ import com.dasbikash.csclientbe.model.request.CsTokenReqResponse
 import com.dasbikash.csclientbe.model.request.CsUserRegisterRequest
 import com.dasbikash.csclientbe.model.response.CsSuccessResponse
 import com.dasbikash.csclientbe.repos.UserRepository
-import com.dasbikash.csclientbe.utils.AuthenticationRequest
-import com.dasbikash.csclientbe.utils.BasicAuthUtils
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -19,13 +17,14 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class AdminTaskService(
-        private var userRepository: UserRepository?=null
+        private var userRepository: UserRepository?=null,
+        private val basicAuthService: BasicAuthService
 ) {
 
     private var csJwtAccessToken:String? = null
 
     private fun getBasicAuthHeader():String{
-        return BasicAuthUtils.getBasicAuthHeader(AuthenticationRequest(CS_ADMIN_USER_ID, CS_ADMIN_USER_PASSWORD))
+        return basicAuthService.getBasicAuthHeader(AuthenticationRequest(CS_ADMIN_USER_ID, CS_ADMIN_USER_PASSWORD))
     }
 
     private fun obtainAdminJwtTokenFromCs():String{

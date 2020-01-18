@@ -1,14 +1,33 @@
-package com.dasbikash.csclientbe.utils
+package com.dasbikash.csclientbe.services
 
+import com.dasbikash.csclientbe.exceptions.CsClientAuthenticationException
 import org.apache.catalina.authenticator.BasicAuthenticator
 import org.apache.tomcat.util.buf.ByteChunk
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.stereotype.Service
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 
-object BasicAuthUtils {
+@Service
+open class BasicAuthService @Autowired constructor(
+        private val authenticationManager: AuthenticationManager
+) {
 
-    private const val BASIC_AUTH_HEADER_PREABLE = "Basic "
+    private val BASIC_AUTH_HEADER_PREABLE = "Basic "
+
+    fun authenticateUser(request: HttpServletRequest){
+        try {
+            val authRequest = getAuthRequest(request)!!
+            println(authRequest)
+            authenticationManager.authenticate(
+                    UsernamePasswordAuthenticationToken(authRequest.id, authRequest.password))
+        } catch (ex: Throwable) {
+            throw CsClientAuthenticationException(ex)
+        }
+    }
 
     fun getAuthRequest(request: HttpServletRequest): AuthenticationRequest? {
         request.getAuthorizationHeader()?.let {
@@ -31,7 +50,7 @@ object BasicAuthUtils {
     }
 }
 
-class AuthenticationRequest(val id: String, val password: String)
+data class AuthenticationRequest(val id: String, val password: String)
 
 fun HttpServletRequest.getAuthorizationHeader():String?{
     return getHeader("Authorization")

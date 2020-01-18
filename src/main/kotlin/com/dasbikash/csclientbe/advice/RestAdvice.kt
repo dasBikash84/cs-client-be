@@ -25,12 +25,14 @@ open class RestAdvice {
     @ExceptionHandler(SignupException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun signupExceptionHandler(ex: SignupException): ErrorResponse {
+        ex.printStackTrace()
         return ErrorResponse.getSignUpErrorResponse(ex.message ?: INVALID_SIGN_UP_MESSAGE)
     }
 
     @ExceptionHandler(CsClientAuthenticationException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     fun authenticationExceptionHandler(ex: CsClientAuthenticationException): ErrorResponse {
+        ex.printStackTrace()
         return ErrorResponse.getAuthErrorResponse(ex.message ?: BAD_AUTH_MESSAGE)
     }
 
@@ -38,6 +40,7 @@ open class RestAdvice {
     @ExceptionHandler(DataIntegrityViolationException::class)
     fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException)
             : ErrorResponse {
+        ex.printStackTrace()
         return ErrorResponse.getInvalidParamErrorResponse(ex.message ?: INVALID_PARAM_MESSAGE)
     }
 
@@ -45,6 +48,7 @@ open class RestAdvice {
     @ExceptionHandler(CsNotAvailableException::class)
     fun handleCsNotAvailableException(ex: CsNotAvailableException)
             : ErrorResponse {
+        ex.printStackTrace()
         return ErrorResponse.getCsNotAvailableErrorResponse(ex.message ?: CS_UNAVAILABLE_MESSAGE)
     }
 
@@ -52,6 +56,7 @@ open class RestAdvice {
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(ex: IllegalArgumentException)
             : ErrorResponse {
+        ex.printStackTrace()
         return ErrorResponse.getIllegalArgumentExceptionErrorResponse(ex.message ?: INVALID_PARAM_MESSAGE)
     }
 }

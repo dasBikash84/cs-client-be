@@ -56,7 +56,7 @@ data class User(
             override fun isEnabled() = enabled
             override fun getUsername() = userId
             override fun isCredentialsNonExpired() = true
-            override fun getPassword(): String = password
+            override fun getPassword(): String = this@User.password!!
             override fun isAccountNonExpired(): Boolean = true
             override fun isAccountNonLocked(): Boolean = true
         }

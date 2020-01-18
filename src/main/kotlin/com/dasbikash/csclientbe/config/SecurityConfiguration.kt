@@ -1,24 +1,25 @@
 package com.dasbikash.csclientbe.config
 
 
-import com.dasbikash.csclientbe.filters.BasicAuthenticationFilter
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @EnableWebSecurity
-class SecurityConfiguration(
+open class SecurityConfiguration @Autowired constructor(
         @Qualifier("userDetailsService")
-        open var userDetailsService: UserDetailsService,
-        open var basicAuthenticationFilter: BasicAuthenticationFilter
+        private val userDetailsService: UserDetailsService,
+        private val passwordEncoder: PasswordEncoder?
 ): WebSecurityConfigurerAdapter() {
 
     @Bean
@@ -30,6 +31,14 @@ class SecurityConfiguration(
         auth.userDetailsService(userDetailsService)
     }
 
+    @Bean
+    open fun authenticationProvider(): DaoAuthenticationProvider {
+        val authenticationProvider = DaoAuthenticationProvider()
+        authenticationProvider.setUserDetailsService(userDetailsService)
+        authenticationProvider.setPasswordEncoder(passwordEncoder)
+        return authenticationProvider
+    }
+
     override fun configure(httpSecurity: HttpSecurity) {
         httpSecurity
                 .csrf().disable()
@@ -38,13 +47,12 @@ class SecurityConfiguration(
                 .antMatchers(OPEN_API_PATH).permitAll()
                 .antMatchers(HttpMethod.GET,SWAGGER_UI_PATH,BASE_HTML_PATH).permitAll()
                 .antMatchers("/${ContextPathUtils.AUTH_CONTROLLER_BASE_PATH}/**").permitAll()
-                .antMatchers("/${ContextPathUtils.USER_CONTROLLER_BASE_PATH}/**").hasAnyAuthority(UserAuthorities.CM.name,UserAuthorities.EndUSER.name)
+                .antMatchers("/${ContextPathUtils.USER_CONTROLLER_BASE_PATH}/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        httpSecurity.addFilterBefore(basicAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
     }
     companion object{
         private const val OPEN_API_PATH = "/v3/api-docs/**"

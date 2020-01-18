@@ -1,6 +1,7 @@
 package com.dasbikash.csclientbe.controllers
 
 import com.dasbikash.csclientbe.config.ContextPathUtils
+import com.dasbikash.csclientbe.filters.annotations.BasicAuthProtected
 import com.dasbikash.csclientbe.model.db.User
 import com.dasbikash.csclientbe.model.request.CsTokenReqResponse
 import com.dasbikash.csclientbe.services.UserService
@@ -14,21 +15,24 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping(path = [ContextPathUtils.USER_CONTROLLER_BASE_PATH])
-class UserController(
-        open var userService: UserService?=null
+open class UserController @Autowired constructor(
+        private val userService: UserService
 ) {
     @GetMapping("generate-access-token")
+    @BasicAuthProtected
     fun getAccessToken(@Autowired request: HttpServletRequest):ResponseEntity<CsTokenReqResponse>{
-        return ResponseEntity.ok(userService!!.generateAccessToken(request))
+        return ResponseEntity.ok(userService.generateAccessToken(request))
     }
     @GetMapping("generate-session-token")
+    @BasicAuthProtected
     fun getSessionToken(@Autowired request: HttpServletRequest):ResponseEntity<CsTokenReqResponse>{
-        return ResponseEntity.ok(userService!!.generateSessionToken(request))
+        return ResponseEntity.ok(userService.generateSessionToken(request))
     }
 
     @GetMapping("user-details/{id}")
+    @BasicAuthProtected
     fun getUserDetails(@PathVariable("id") id:String,@Autowired request: HttpServletRequest)
         :ResponseEntity<User>{
-        return ResponseEntity.ok(userService!!.getUserDetails(id))
+        return ResponseEntity.ok(userService.getUserDetails(id))
     }
 }
