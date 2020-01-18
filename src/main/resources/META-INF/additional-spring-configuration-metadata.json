@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "cs.client_id",
+      "type": "java.lang.String",
+      "description": "Registered user id on Chat Server back-end."
+    },
+    {
+      "name": "cs.password",
+      "type": "java.lang.String",
+      "description": "Chat server account password."
+    }
+  ] }

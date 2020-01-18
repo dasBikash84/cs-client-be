@@ -7,6 +7,8 @@ import com.dasbikash.csclientbe.model.request.CsTokenReqResponse
 import com.dasbikash.csclientbe.model.request.CsUserRegisterRequest
 import com.dasbikash.csclientbe.model.response.CsSuccessResponse
 import com.dasbikash.csclientbe.repos.UserRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -16,10 +18,15 @@ import org.springframework.web.client.RestTemplate
 
 
 @Service
-class AdminTaskService(
-        private var userRepository: UserRepository?=null,
-        private val basicAuthService: BasicAuthService
+class AdminTaskService @Autowired constructor(
+        private val userRepository: UserRepository,
+        private val basicAuthService: BasicAuthService,
+        @Value("\${cs.client_id}")
+        private val CS_ADMIN_USER_ID:String,
+        @Value("\${cs.password}")
+        private val CS_ADMIN_USER_PASSWORD:String
 ) {
+
 
     private var csJwtAccessToken:String? = null
 
@@ -55,7 +62,7 @@ class AdminTaskService(
     }
 
     fun registerUser(csUserRegisterRequest: CsUserRegisterRequest):CsSuccessResponse?{
-        val user = userRepository!!.findById(csUserRegisterRequest.id).orElseThrow { IllegalArgumentException() }
+        val user = userRepository.findById(csUserRegisterRequest.id).orElseThrow { IllegalArgumentException() }
         val entity = HttpEntity<Any>(csUserRegisterRequest, getJwtHeader())
         val restTemplate = RestTemplate()
         if (user.isCustomerManager) {
@@ -111,10 +118,6 @@ class AdminTaskService(
         private const val DISABLE_USER_PATH = "disable-user/{userId}"
         private const val SIGN_OUT_PATH = "sign-out"
 
-        private const val CS_ADMIN_USER_ID = "client001"
-        private const val CS_ADMIN_USER_PASSWORD = "1234"
-
         private const val JWT_TOKEN_PREAMBLE = "Bearer "
-
     }
 }
