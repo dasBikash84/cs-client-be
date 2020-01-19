@@ -24,7 +24,9 @@ class AdminTaskService @Autowired constructor(
         @Value("\${cs.client_id}")
         private val CS_ADMIN_USER_ID:String,
         @Value("\${cs.password}")
-        private val CS_ADMIN_USER_PASSWORD:String
+        private val CS_ADMIN_USER_PASSWORD:String,
+        @Value("\${cs.base_path}")
+        private val CHAT_SERVICE_BASE_PATH:String
 ) {
 
 
@@ -99,25 +101,21 @@ class AdminTaskService @Autowired constructor(
             throw CsClientAuthenticationException()
         }
     }
+    private val ADMIN_BASE_PATH = CHAT_SERVICE_BASE_PATH+"client-admin/"
+    private val LOG_IN_PATH = "auth/login"
+    private val REGISTER_CM_PATH = "register-cm"
+    private val REGISTER_USER_PATH = "register-user"
+    private val GENERATE_CM_ACCESS_TOKEN_PATH = "cm-access-token/{cmId}"
+    private val GENERATE_USER_ACCESS_TOKEN_PATH = "user-access-token/{userId}"
+    private val GENERATE_CM_SESSION_TOKEN_PATH = "cm-session-token/{cmId}"
+    private val GENERATE_USER_SESSION_TOKEN_PATH = "user-session-token/{userId}"
+    private val GET_CM_PATH = "get-cm/{cmId}"
+    private val GET_USER_PATH = "get-user/{userId}"
+    private val ENABLE_CM_PATH = "enable-cm/{cmId}"
+    private val ENABLE_USER_PATH = "enable-user/{userId}"
+    private val DISABLE_CM_PATH = "disable-cm/{cmId}"
+    private val DISABLE_USER_PATH = "disable-user/{userId}"
+    private val SIGN_OUT_PATH = "sign-out"
 
-    companion object{
-        private const val CHAT_SERVICE_BASE_PATH = "http://localhost:8055/"
-        private const val ADMIN_BASE_PATH = CHAT_SERVICE_BASE_PATH+"client-admin/"
-        private const val LOG_IN_PATH = "auth/login"
-        private const val REGISTER_CM_PATH = "register-cm"
-        private const val REGISTER_USER_PATH = "register-user"
-        private const val GENERATE_CM_ACCESS_TOKEN_PATH = "cm-access-token/{cmId}"
-        private const val GENERATE_USER_ACCESS_TOKEN_PATH = "user-access-token/{userId}"
-        private const val GENERATE_CM_SESSION_TOKEN_PATH = "cm-session-token/{cmId}"
-        private const val GENERATE_USER_SESSION_TOKEN_PATH = "user-session-token/{userId}"
-        private const val GET_CM_PATH = "get-cm/{cmId}"
-        private const val GET_USER_PATH = "get-user/{userId}"
-        private const val ENABLE_CM_PATH = "enable-cm/{cmId}"
-        private const val ENABLE_USER_PATH = "enable-user/{userId}"
-        private const val DISABLE_CM_PATH = "disable-cm/{cmId}"
-        private const val DISABLE_USER_PATH = "disable-user/{userId}"
-        private const val SIGN_OUT_PATH = "sign-out"
-
-        private const val JWT_TOKEN_PREAMBLE = "Bearer "
-    }
+    private val JWT_TOKEN_PREAMBLE = "Bearer "
 }
