@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 
 
@@ -65,12 +66,27 @@ class AdminTaskService @Autowired constructor(
 
     fun registerUser(csUserRegisterRequest: CsUserRegisterRequest):CsSuccessResponse?{
         val user = userRepository.findById(csUserRegisterRequest.id).orElseThrow { IllegalArgumentException() }
-        val entity = HttpEntity<Any>(csUserRegisterRequest, getJwtHeader())
-        val restTemplate = RestTemplate()
-        if (user.isCustomerManager) {
-            return restTemplate.exchange(ADMIN_BASE_PATH + REGISTER_CM_PATH, HttpMethod.PUT, entity, CsSuccessResponse::class.java).body
-        }else{
-            return restTemplate.exchange(ADMIN_BASE_PATH + REGISTER_USER_PATH, HttpMethod.PUT, entity, CsSuccessResponse::class.java).body
+        var csSuccessResponse:CsSuccessResponse?=null
+        runWithJwtRefresher {
+            val entity = HttpEntity<Any>(csUserRegisterRequest, it)
+            val restTemplate = RestTemplate()
+            if (user.isCustomerManager) {
+                csSuccessResponse =
+                        restTemplate.exchange(ADMIN_BASE_PATH + REGISTER_CM_PATH, HttpMethod.PUT, entity, CsSuccessResponse::class.java).body
+            } else {
+                csSuccessResponse  =
+                        restTemplate.exchange(ADMIN_BASE_PATH + REGISTER_USER_PATH, HttpMethod.PUT, entity, CsSuccessResponse::class.java).body
+            }
+        }
+        return csSuccessResponse
+    }
+
+    private fun <T:Any?> runWithJwtRefresher(task:(HttpHeaders)->T):T{
+        try {
+            return task(getJwtHeader())
+        }catch (ex: RestClientException){
+            csJwtAccessToken = null
+            return task(getJwtHeader())
         }
     }
 
@@ -92,11 +108,12 @@ class AdminTaskService @Autowired constructor(
 
     private fun generateUserToken(user: User,path:String,validateUserType:(User)->Boolean):CsTokenReqResponse{
         if (validateUserType(user)){
-            val entity = HttpEntity<Any>(getJwtHeader())
-            val restTemplate = RestTemplate()
-            return restTemplate.exchange(ADMIN_BASE_PATH + path,
-                                            HttpMethod.GET, entity,
-                                            CsTokenReqResponse::class.java,user.userId!!).body!!
+            return runWithJwtRefresher {
+                val entity = HttpEntity<Any>(it)
+                val restTemplate = RestTemplate()
+                restTemplate.exchange(ADMIN_BASE_PATH + path, HttpMethod.GET, entity,
+                        CsTokenReqResponse::class.java, user.userId!!).body!!
+            }
         }else{
             throw CsClientAuthenticationException()
         }
