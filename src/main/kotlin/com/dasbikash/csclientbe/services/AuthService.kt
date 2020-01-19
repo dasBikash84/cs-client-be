@@ -16,11 +16,10 @@ class AuthService(
         private var registererToCsService: RegistererToCsService?=null
 ) {
 
-    fun userSignUp(@Valid user: User, isEndUser:Boolean=true): SuccessResponse {
+    fun userSignUp(@Valid user: User): SuccessResponse {
+        println(user)
         checkIfUserIdTaken(user.userId)
         user.password = passwordEncoder!!.encode(user.password)
-        user.isEndUser = isEndUser
-        user.isCustomerManager = !isEndUser
         userRepository!!.save(user)
         try {
             registererToCsService!!.registerUser(user.getUserRegisterRequest())
@@ -41,7 +40,6 @@ class AuthService(
     }
 
     companion object{
-//        private const val CM_SIGN_SUCCESS_MESSAGE = "Customer manger sign up success."
         private const val USER_SIGN_SUCCESS_MESSAGE = "User sign up success."
         private const val DUPLICATE_USER_ID_MESSAGE = "User id already taken!!"
     }

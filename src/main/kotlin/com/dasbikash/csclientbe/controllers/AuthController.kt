@@ -17,19 +17,13 @@ import javax.servlet.http.HttpServletRequest
 class AuthController(
         private var authService: AuthService?=null
 ) {
-    @PutMapping(CM_SIGN_UP_PATH)
-    fun cmSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
-            ResponseEntity<SuccessResponse>{
-        return ResponseEntity.ok(authService!!.userSignUp(user,isEndUser = false))
-    }
     @PutMapping(USER_SIGN_UP_PATH)
     fun userSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
             ResponseEntity<SuccessResponse>{
-        return ResponseEntity.ok(authService!!.userSignUp(user,isEndUser = true))
+        return ResponseEntity.ok(authService!!.userSignUp(user))
     }
 
     companion object{
-        private const val CM_SIGN_UP_PATH = "cm-sign-up"
         private const val USER_SIGN_UP_PATH = "user-sign-up"
     }
 }
