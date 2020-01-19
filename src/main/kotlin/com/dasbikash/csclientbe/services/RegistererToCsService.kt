@@ -4,7 +4,6 @@ import com.dasbikash.csclientbe.model.request.CsUserRegisterRequest
 import com.dasbikash.csclientbe.repos.UserRepository
 import com.dasbikash.csclientbe.utils.BgTaskUtils
 import com.dasbikash.csclientbe.utils.DateUtils
-import kotlinx.coroutines.delay
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Service
 

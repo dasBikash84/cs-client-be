@@ -4,16 +4,21 @@ import com.dasbikash.csclientbe.exceptions.CsClientAuthenticationException
 import com.dasbikash.csclientbe.exceptions.CsNotAvailableException
 import com.dasbikash.csclientbe.exceptions.SignupException
 import com.dasbikash.csclientbe.model.response.ErrorResponse
+import com.dasbikash.csclientbe.services.ErrorLogService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import java.lang.IllegalArgumentException
+import javax.servlet.http.HttpServletRequest
 
 
 @RestControllerAdvice
-open class RestAdvice {
+open class RestAdvice  @Autowired constructor(
+        private val errorLogService: ErrorLogService
+) {
 
     private val INVALID_SIGN_UP_MESSAGE = "Invalid sign up parameters!!"
     private val INVALID_PARAM_MESSAGE = "Invalid parameters!!"
@@ -24,39 +29,44 @@ open class RestAdvice {
 
     @ExceptionHandler(SignupException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun signupExceptionHandler(ex: SignupException): ErrorResponse {
-        ex.printStackTrace()
+    fun signupExceptionHandler(httpServletRequest: HttpServletRequest, ex: SignupException): ErrorResponse {
+        logError(httpServletRequest, ex)
         return ErrorResponse.getSignUpErrorResponse(ex.message ?: INVALID_SIGN_UP_MESSAGE)
     }
 
     @ExceptionHandler(CsClientAuthenticationException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    fun authenticationExceptionHandler(ex: CsClientAuthenticationException): ErrorResponse {
-        ex.printStackTrace()
+    fun authenticationExceptionHandler(httpServletRequest: HttpServletRequest, ex: CsClientAuthenticationException): ErrorResponse {
+        logError(httpServletRequest, ex)
         return ErrorResponse.getAuthErrorResponse(ex.message ?: BAD_AUTH_MESSAGE)
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DataIntegrityViolationException::class)
-    fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException)
+    fun handleDataIntegrityViolationException(httpServletRequest: HttpServletRequest, ex: DataIntegrityViolationException)
             : ErrorResponse {
-        ex.printStackTrace()
+        logError(httpServletRequest, ex)
         return ErrorResponse.getInvalidParamErrorResponse(ex.message ?: INVALID_PARAM_MESSAGE)
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CsNotAvailableException::class)
-    fun handleCsNotAvailableException(ex: CsNotAvailableException)
+    fun handleCsNotAvailableException(httpServletRequest: HttpServletRequest, ex: CsNotAvailableException)
             : ErrorResponse {
-        ex.printStackTrace()
+        logError(httpServletRequest, ex)
         return ErrorResponse.getCsNotAvailableErrorResponse(ex.message ?: CS_UNAVAILABLE_MESSAGE)
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgumentException(ex: IllegalArgumentException)
+    fun handleIllegalArgumentException(httpServletRequest: HttpServletRequest, ex: IllegalArgumentException)
             : ErrorResponse {
-        ex.printStackTrace()
+        logError(httpServletRequest, ex)
         return ErrorResponse.getIllegalArgumentExceptionErrorResponse(ex.message ?: INVALID_PARAM_MESSAGE)
+    }
+
+    private fun logError(httpServletRequest: HttpServletRequest, ex:Throwable){
+        ex.printStackTrace()
+        errorLogService.logError(httpServletRequest,ex)
     }
 }
