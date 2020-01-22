@@ -18,22 +18,22 @@ open class UserService @Autowired constructor(
 ) {
     fun generateAccessToken(request: HttpServletRequest): CsTokenReqResponse {
         basicAuthService.getAuthRequest(request)!!.apply {
-            userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
+            userRepository.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
                 if (isCustomerManager){
-                    return adminTaskService!!.generateCustomerManagerAccessToken(this)
+                    return adminTaskService.generateCustomerManagerAccessToken(this)
                 }else{
-                    return adminTaskService!!.generateEndUserAccessToken(this)
+                    return adminTaskService.generateEndUserAccessToken(this)
                 }
             }
         }
     }
     fun generateSessionToken(request: HttpServletRequest): CsTokenReqResponse {
         basicAuthService.getAuthRequest(request)!!.apply {
-            userRepository!!.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
+            userRepository.findById(id).orElseThrow { CsClientAuthenticationException() }.apply {
                 if (isCustomerManager){
-                    return adminTaskService!!.generateCustomerManagerSessionToken(this)
+                    return adminTaskService.generateCustomerManagerSessionToken(this)
                 }else{
-                    return adminTaskService!!.generateEndUserSessionToken(this)
+                    return adminTaskService.generateEndUserSessionToken(this)
                 }
             }
         }
@@ -41,5 +41,9 @@ open class UserService @Autowired constructor(
 
     fun getUserDetails(id: String): User {
         return userRepository.findById(id).orElseThrow { IllegalArgumentException() }
+    }
+
+    fun generateAutoChatSessionToken(): CsTokenReqResponse {
+        return adminTaskService.generateAutoChatSessionToken()
     }
 }

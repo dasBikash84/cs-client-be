@@ -35,4 +35,10 @@ open class UserController @Autowired constructor(
         :ResponseEntity<User>{
         return ResponseEntity.ok(userService.getUserDetails(id))
     }
+
+    @GetMapping("generate-auto-chat-session-token")
+    @BasicAuthProtected
+    fun getAutoChatSessionToken(@Autowired request: HttpServletRequest):ResponseEntity<CsTokenReqResponse>{
+        return ResponseEntity.ok(userService.generateAutoChatSessionToken())
+    }
 }

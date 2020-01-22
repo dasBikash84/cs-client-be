@@ -118,6 +118,16 @@ class AdminTaskService @Autowired constructor(
             throw CsClientAuthenticationException()
         }
     }
+
+    fun generateAutoChatSessionToken(): CsTokenReqResponse {
+        return runWithJwtRefresher {
+            val entity = HttpEntity<Any>(it)
+            val restTemplate = RestTemplate()
+            restTemplate.exchange(ADMIN_BASE_PATH + GENERATE_AUTO_CHAT_SESSION_TOKEN_PATH, HttpMethod.GET, entity,
+                    CsTokenReqResponse::class.java).body!!
+        }
+    }
+
     private val ADMIN_BASE_PATH = CHAT_SERVICE_BASE_PATH+"client-admin/"
     private val LOG_IN_PATH = "auth/login"
     private val REGISTER_CM_PATH = "register-cm"
@@ -126,6 +136,7 @@ class AdminTaskService @Autowired constructor(
     private val GENERATE_USER_ACCESS_TOKEN_PATH = "user-access-token/{userId}"
     private val GENERATE_CM_SESSION_TOKEN_PATH = "cm-session-token/{cmId}"
     private val GENERATE_USER_SESSION_TOKEN_PATH = "user-session-token/{userId}"
+    private val GENERATE_AUTO_CHAT_SESSION_TOKEN_PATH = "auto-chat-session-token"
     private val GET_CM_PATH = "get-cm/{cmId}"
     private val GET_USER_PATH = "get-user/{userId}"
     private val ENABLE_CM_PATH = "enable-cm/{cmId}"
