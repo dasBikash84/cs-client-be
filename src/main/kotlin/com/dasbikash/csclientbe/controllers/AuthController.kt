@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest
 class AuthController @Autowired constructor(
         private val authService: AuthService
 ) {
-    @PutMapping(USER_SIGN_UP_PATH)
+    @PutMapping(value=[USER_SIGN_UP_PATH])
     fun userSignUp(@RequestBody user: User,@Autowired request:HttpServletRequest):
             ResponseEntity<SuccessResponse>{
         return ResponseEntity.ok(authService.userSignUp(user))
